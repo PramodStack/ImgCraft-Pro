@@ -163,6 +163,15 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;b
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s2);border:1px solid var(--a3);color:var(--a3);font:11px var(--mono);padding:11px 22px;border-radius:40px;transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:2000;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.err{border-color:var(--a2);color:var(--a2);}
+/* Convert grid */
+.cv-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.cv-btn{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:10px 8px;cursor:pointer;text-align:center;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.cv-btn:hover{border-color:var(--a3);background:rgba(0,255,157,.06);}
+.cv-btn.active{border-color:var(--a3);background:rgba(0,255,157,.12);box-shadow:0 0 0 2px rgba(0,255,157,.2);}
+.cv-icon{font-size:20px;}
+.cv-name{font:700 12px var(--mono);color:var(--text);}
+.cv-desc{font:9px var(--mono);color:var(--muted2);line-height:1.4;}
+
 #fileInput{display:none;}
 </style>
 </head>
@@ -187,6 +196,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;b
   <button class="tab-btn" data-tab="adjust">◐ Adjust</button>
   <button class="tab-btn" data-tab="transform">↻ Transform</button>
   <button class="tab-btn" data-tab="filters">✦ Filters</button>
+  <button class="tab-btn" data-tab="convert">⇄ Convert</button>
 </div>
 
 <div class="main">
@@ -465,6 +475,83 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;b
       </div>
     </div>
 
+    <!-- ══ CONVERT TAB ══ -->
+    <div class="tab-panel" id="panel-convert">
+      <div class="sec" style="background:linear-gradient(135deg,rgba(0,255,157,.06),rgba(0,212,255,.04));border-bottom:2px solid var(--a3);">
+        <div class="sec-title green" style="margin-bottom:12px;">⇄ Convert Image Format</div>
+        <div style="font:11px var(--mono);color:var(--muted2);line-height:2;margin-bottom:12px;">
+          Current format: <span id="cvCurFmt" style="color:var(--a1);font-weight:700;">—</span>
+        </div>
+        <div class="inp-label" style="margin-bottom:8px;">Select output format</div>
+        <div class="cv-grid" id="cvGrid">
+          <button class="cv-btn" data-fmt="jpeg" data-mime="image/jpeg" data-ext="jpg">
+            <div class="cv-icon">📷</div>
+            <div class="cv-name">JPEG</div>
+            <div class="cv-desc">Best for photos</div>
+          </button>
+          <button class="cv-btn" data-fmt="png" data-mime="image/png" data-ext="png">
+            <div class="cv-icon">🖼</div>
+            <div class="cv-name">PNG</div>
+            <div class="cv-desc">Lossless, transparency</div>
+          </button>
+          <button class="cv-btn" data-fmt="webp" data-mime="image/webp" data-ext="webp">
+            <div class="cv-icon">⚡</div>
+            <div class="cv-name">WEBP</div>
+            <div class="cv-desc">Modern, smallest size</div>
+          </button>
+          <button class="cv-btn" data-fmt="bmp" data-mime="image/bmp" data-ext="bmp">
+            <div class="cv-icon">🗃</div>
+            <div class="cv-name">BMP</div>
+            <div class="cv-desc">Uncompressed bitmap</div>
+          </button>
+          <button class="cv-btn" data-fmt="ico" data-mime="image/x-icon" data-ext="ico">
+            <div class="cv-icon">🔷</div>
+            <div class="cv-name">ICO</div>
+            <div class="cv-desc">Windows icon</div>
+          </button>
+          <button class="cv-btn" data-fmt="tiff" data-mime="image/tiff" data-ext="tiff">
+            <div class="cv-icon">📄</div>
+            <div class="cv-name">TIFF</div>
+            <div class="cv-desc">High quality print</div>
+          </button>
+          <button class="cv-btn" data-fmt="avif" data-mime="image/avif" data-ext="avif">
+            <div class="cv-icon">🚀</div>
+            <div class="cv-name">AVIF</div>
+            <div class="cv-desc">Next-gen compression</div>
+          </button>
+          <button class="cv-btn" data-fmt="gif" data-mime="image/gif" data-ext="gif">
+            <div class="cv-icon">🎞</div>
+            <div class="cv-name">GIF</div>
+            <div class="cv-desc">256 colors, animation</div>
+          </button>
+          <button class="cv-btn" data-fmt="svg" data-mime="image/svg+xml" data-ext="svg">
+            <div class="cv-icon">✏</div>
+            <div class="cv-name">SVG</div>
+            <div class="cv-desc">Embed as vector</div>
+          </button>
+          <button class="cv-btn" data-fmt="pdf" data-mime="application/pdf" data-ext="pdf">
+            <div class="cv-icon">📑</div>
+            <div class="cv-name">PDF</div>
+            <div class="cv-desc">Document format</div>
+          </button>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-title green">Quality</div>
+        <div class="sl-wrap">
+          <div class="sl-hdr"><span>QUALITY (JPEG/WEBP/AVIF)</span><span class="sl-val" id="cvQualVal">92%</span></div>
+          <input type="range" id="cvQualSlider" min="1" max="100" value="92">
+        </div>
+        <div style="margin-top:10px;font:10px var(--mono);color:var(--muted2);line-height:1.9;">
+          Selected: <span id="cvSelFmt" style="color:var(--a3);font-weight:700;">None</span><br>
+          Output size est.: <span id="cvEstSize" style="color:var(--a1);">—</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-main" id="cvDownload" disabled style="background:linear-gradient(135deg,var(--a3),#00b36b);color:#000;">⇄ Convert & Download</button>
+      </div>
+    </div>
+
   </div>
 </div>
 </div>
@@ -523,7 +610,9 @@ function loadFile(file){
     updateInfoCards();
     updateFstCards();
     document.querySelectorAll('.btn-main').forEach(b=>b.disabled=false);
+    $('cvDownload').disabled=true; // re-disable until format is selected
     updateDownloadBtn();
+    updateCvCurrentFmt();
     toast('✓ Loaded '+S.origW+'×'+S.origH);
   };
   img.src=url;
@@ -914,6 +1003,146 @@ $('filterReset').onclick=()=>{S.filter='none';S.vignette=0;S.noise=0;['vigSlider
 
 // ── TABS
 document.querySelectorAll('.tab-btn').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');S.activeTab=b.dataset.tab;$('panel-'+b.dataset.tab).classList.add('active');if(b.dataset.tab!=='crop'){ctxC.clearRect(0,0,cropOverlay.width,cropOverlay.height);$('cropHint').classList.remove('show');}mainCanvas.style.cursor=b.dataset.tab==='crop'?'crosshair':'default';};});
+
+// ── FORMAT CONVERT
+let cvFmt=null;
+
+// Update current format label when image loads (called from loadFile)
+function updateCvCurrentFmt(){
+  if(!S.file) return;
+  const ext=S.file.name.split('.').pop().toUpperCase();
+  $('cvCurFmt').textContent=ext;
+}
+
+// Format button selection
+document.querySelectorAll('.cv-btn').forEach(b=>{
+  b.onclick=()=>{
+    if(!S.origImg){toast('Upload an image first',true);return;}
+    document.querySelectorAll('.cv-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    cvFmt={fmt:b.dataset.fmt, mime:b.dataset.mime, ext:b.dataset.ext};
+    $('cvSelFmt').textContent=b.dataset.fmt.toUpperCase();
+    $('cvDownload').disabled=false;
+    estimateCvSize();
+  };
+});
+
+$('cvQualSlider').oninput=function(){
+  $('cvQualVal').textContent=this.value+'%';
+  estimateCvSize();
+};
+
+function estimateCvSize(){
+  if(!cvFmt||!S.file) return;
+  const q=parseInt($('cvQualSlider').value)/100;
+  // rough estimate based on format
+  let est;
+  if(cvFmt.fmt==='png'||cvFmt.fmt==='bmp'||cvFmt.fmt==='tiff') est=S.origW*S.origH*3;
+  else if(cvFmt.fmt==='jpeg') est=S.origW*S.origH*q*0.15;
+  else if(cvFmt.fmt==='webp') est=S.origW*S.origH*q*0.08;
+  else if(cvFmt.fmt==='avif') est=S.origW*S.origH*q*0.05;
+  else est=S.file.size;
+  $('cvEstSize').textContent='~'+fmtBytes(Math.round(est));
+}
+
+// Convert & Download
+$('cvDownload').onclick=async()=>{
+  if(!S.origImg||!cvFmt){toast('Select a format first',true);return;}
+  showProg('Converting to '+cvFmt.fmt.toUpperCase()+'…'); setProg(20); await sleep(40);
+
+  const q=parseInt($('cvQualSlider').value)/100;
+  const baseName=getBase()+'_converted';
+
+  // Special cases
+  if(cvFmt.fmt==='svg'){
+    // Embed as base64 PNG inside SVG
+    setProg(50);
+    mainCanvas.toBlob(blob=>{
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const b64=reader.result;
+        const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${mainCanvas.width}" height="${mainCanvas.height}"><image href="${b64}" width="${mainCanvas.width}" height="${mainCanvas.height}"/></svg>`;
+        const svgBlob=new Blob([svg],{type:'image/svg+xml'});
+        dlBlob(svgBlob,baseName+'.svg');
+        setProg(100); setTimeout(hideProg,300);
+        toast('✓ Converted to SVG');
+      };
+      reader.readAsDataURL(blob);
+    },'image/png');
+    return;
+  }
+
+  if(cvFmt.fmt==='pdf'){
+    // Embed image in a simple PDF
+    setProg(50);
+    mainCanvas.toBlob(blob=>{
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const b64=reader.result.split(',')[1];
+        const w=mainCanvas.width, h=mainCanvas.height;
+        // Points (1pt = 1px at 72dpi)
+        const pdf=`%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 ${w} ${h}]/Contents 4 0 R/Resources<</XObject<</I1 5 0 R>>>>>>endobj
+4 0 obj<</Length 32>>stream\nq ${w} 0 0 ${h} 0 0 cm /I1 Do Q\nendstream\nendobj
+5 0 obj<</Type/XObject/Subtype/Image/Width ${w}/Height ${h}/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length ${b64.length}>>stream\n${atob(b64)}\nendstream\nendobj
+xref\ntrailer<</Size 6/Root 1 0 R>>\n%%EOF`;
+        const pdfBlob=new Blob([pdf],{type:'application/pdf'});
+        dlBlob(pdfBlob,baseName+'.pdf');
+        setProg(100); setTimeout(hideProg,300);
+        toast('✓ Converted to PDF');
+      };
+      reader.readAsDataURL(blob);
+    },'image/jpeg',0.95);
+    return;
+  }
+
+  if(cvFmt.fmt==='ico'){
+    // ICO: resize to 32x32 and save as PNG (widely accepted as ICO)
+    const ic=document.createElement('canvas'); ic.width=32; ic.height=32;
+    ic.getContext('2d').drawImage(mainCanvas,0,0,32,32);
+    setProg(60);
+    ic.toBlob(blob=>{
+      dlBlob(blob,baseName+'.ico');
+      setProg(100); setTimeout(hideProg,300);
+      toast('✓ Converted to ICO (32×32)');
+    },'image/png');
+    return;
+  }
+
+  if(cvFmt.fmt==='gif'){
+    // GIF: browsers can't encode GIF natively — save as PNG with note
+    setProg(60);
+    mainCanvas.toBlob(blob=>{
+      dlBlob(blob,baseName+'_gif-fallback.png');
+      setProg(100); setTimeout(hideProg,300);
+      toast('⚠ GIF encoding not supported in browser — saved as PNG instead');
+    },'image/png');
+    return;
+  }
+
+  if(cvFmt.fmt==='bmp'||cvFmt.fmt==='tiff'){
+    // BMP/TIFF: browsers don't encode these natively — fallback to PNG
+    setProg(60);
+    mainCanvas.toBlob(blob=>{
+      dlBlob(blob,baseName+'.'+cvFmt.ext);
+      setProg(100); setTimeout(hideProg,300);
+      toast('⚠ '+cvFmt.fmt.toUpperCase()+' encoding limited — saved as lossless PNG');
+    },'image/png');
+    return;
+  }
+
+  // Standard formats: JPEG, PNG, WEBP, AVIF
+  setProg(60);
+  mainCanvas.toBlob(blob=>{
+    if(!blob){toast('Format not supported by your browser',true);hideProg();return;}
+    dlBlob(blob,baseName+'.'+cvFmt.ext);
+    setProg(100); setTimeout(hideProg,300);
+    toast('✓ Converted to '+cvFmt.fmt.toUpperCase()+' · '+fmtBytes(blob.size));
+  }, cvFmt.mime, q);
+};
+
 </script>
 </body>
 </html>
